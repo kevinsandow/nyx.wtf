@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+  />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>Stepper</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@emotion/react@11.11.1/dist/emotion-react.umd.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@emotion/styled@11.11.0/dist/emotion-styled.umd.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@mui/material@5.15.15/umd/material-ui.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+  <script type="text/babel">
+    function App() {
+      const options = [
+        { label: 'Lorem Ipsum', value: 'lorem' },
+        { label: 'Foo', value: 'foo', group: 'F' },
+        { label: 'Bar', value: 'bar', group: 'B' },
+        { label: 'Baz', value: 'bar', group: 'B' },
+      ]
+
+      return (
+        <MaterialUI.Stack p={4} gap={2}>
+          <MaterialUI.Autocomplete
+            sx={{ width: 800 }}
+            multiple
+            options={options}
+            groupBy={(option) => option.group}
+            getOptionLabel={(option) => option.label}
+            renderInput={(params) => <MaterialUI.TextField {...params} label="Roles" />}
+            renderOption={(props, option, { selected }) => {
+              const { key, ...optionProps } = props
+              return (
+                <li key={key} {...optionProps}>
+                  <MaterialUI.Checkbox checked={selected} />
+                  {option.label}
+                </li>
+              )
+            }}
+            renderTags={(value, getTagProps) => (
+              <MaterialUI.Stack direction="row" gap={1}>
+                {value.map((option, index) => (
+                  <MaterialUI.Chip label={option.group ? `${option.label} (${option.group})` : option.label} {...getTagProps({ index })} />
+                ))}
+              </MaterialUI.Stack>
+            )}
+          />
+          <pre>
+
+          </pre>
+        </MaterialUI.Stack>
+      )
+    }
+
+    const theme = MaterialUI.createTheme({
+      spacing: 4,
+    })
+
+    function AppWrapper() {
+      return (
+        <React.StrictMode>
+          <MaterialUI.ThemeProvider theme={theme}>
+            <MaterialUI.CssBaseline />
+            <App />
+          </MaterialUI.ThemeProvider>
+        </React.StrictMode>
+      )
+    }
+
+    const root = ReactDOM.createRoot(document.querySelector('#root'))
+    root.render(<AppWrapper />)
+  </script>
+</head>
+<body>
+<div id="root"></div>
+</body>
+</html>
