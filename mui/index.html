@@ -33,13 +33,13 @@
         { label: 'Weedle', value: 'weedle', group: 'Bug' },
         { label: 'Kakuna', value: 'kakuna', group: 'Bug' },
         { label: 'Beedrill', value: 'beedrill', group: 'Bug' },
-        { label: 'Pidgey', value: 'pidgey', group: 'Normal' },
-        { label: 'Pidgeotto', value: 'pidgeotto', group: 'Normal' },
-        { label: 'Pidgeot', value: 'pidgeot', group: 'Normal' },
-        { label: 'Rattata', value: 'rattata', group: 'Normal' },
-        { label: 'Raticate', value: 'raticate', group: 'Normal' },
-        { label: 'Spearow', value: 'spearow', group: 'Normal' },
-        { label: 'Fearow', value: 'fearow', group: 'Normal' },
+        { label: 'Pidgey', value: 'pidgey' },
+        { label: 'Pidgeotto', value: 'pidgeotto' },
+        { label: 'Pidgeot', value: 'pidgeot' },
+        { label: 'Rattata', value: 'rattata' },
+        { label: 'Raticate', value: 'raticate' },
+        { label: 'Spearow', value: 'spearow' },
+        { label: 'Fearow', value: 'fearow' },
         { label: 'Ekans', value: 'ekans', group: 'Poison' },
         { label: 'Arbok', value: 'arbok', group: 'Poison' },
         { label: 'Pikachu', value: 'pikachu', group: 'Electric' },
@@ -56,8 +56,8 @@
         { label: 'Clefable', value: 'clefable', group: 'Fairy' },
         { label: 'Vulpix', value: 'vulpix', group: 'Fire' },
         { label: 'Ninetales', value: 'ninetales', group: 'Fire' },
-        { label: 'Jigglypuff', value: 'jigglypuff', group: 'Normal' },
-        { label: 'Wigglytuff', value: 'wigglytuff', group: 'Normal' },
+        { label: 'Jigglypuff', value: 'jigglypuff' },
+        { label: 'Wigglytuff', value: 'wigglytuff' },
         { label: 'Zubat', value: 'zubat', group: 'Poison' },
         { label: 'Golbat', value: 'golbat', group: 'Poison' },
         { label: 'Oddish', value: 'oddish', group: 'Grass' },
@@ -68,7 +68,10 @@
         { label: 'Venonat', value: 'venonat', group: 'Bug' },
         { label: 'Venomoth', value: 'venomoth', group: 'Bug' },
         { label: 'Diglett', value: 'diglett', group: 'Ground' }
-      ]
+      ].sort((a, b) => {
+        if (!a.group || !b.group) return -1
+        return a.group.localeCompare(b.group)
+      })
 
       return (
         <MaterialUI.Stack p={4} gap={2}>
@@ -90,11 +93,11 @@
               )
             }}
             renderTags={(value, getTagProps) => (
-              <MaterialUI.Stack direction="row" gap={1}>
+              <React.Fragment>
                 {value.map((option, index) => (
                   <MaterialUI.Chip label={option.group ? `${option.label} (${option.group})` : option.label} {...getTagProps({ index })} />
                 ))}
-              </MaterialUI.Stack>
+              </React.Fragment>
             )}
           />
         </MaterialUI.Stack>
@@ -110,7 +113,9 @@
         <React.StrictMode>
           <MaterialUI.ThemeProvider theme={theme}>
             <MaterialUI.CssBaseline />
-            <App />
+            <MaterialUI.Container>
+              <App />
+            </MaterialUI.Container>
           </MaterialUI.ThemeProvider>
         </React.StrictMode>
       )
