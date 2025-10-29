@@ -74,15 +74,15 @@
       })
 
       return (
-        <MaterialUI.Stack p={4} gap={2}>
+        <MaterialUI.Container sx={{ pt: 5 }}>
           <MaterialUI.Autocomplete
-            sx={{ width: 800 }}
             multiple
+            fullWidth
             disableCloseOnSelect
             options={options}
             groupBy={(option) => option.group}
             getOptionLabel={(option) => option.label}
-            renderInput={(params) => <MaterialUI.TextField {...params} label="Roles" />}
+            renderInput={(params) => <MaterialUI.TextField {...params} label="Pokemon" />}
             renderOption={(props, option, { selected }) => {
               const { key, ...optionProps } = props
               return (
@@ -100,7 +100,7 @@
               </React.Fragment>
             )}
           />
-        </MaterialUI.Stack>
+        </MaterialUI.Container>
       )
     }
 
@@ -113,9 +113,7 @@
         <React.StrictMode>
           <MaterialUI.ThemeProvider theme={theme}>
             <MaterialUI.CssBaseline />
-            <MaterialUI.Container>
-              <App />
-            </MaterialUI.Container>
+            <App />
           </MaterialUI.ThemeProvider>
         </React.StrictMode>
       )
