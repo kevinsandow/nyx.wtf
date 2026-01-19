@@ -17,89 +17,26 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
   <script type="text/babel">
     function App() {
-      const options = [
-        { label: 'Bulbasaur', value: 'bulbasaur', group: 'Grass' },
-        { label: 'Ivysaur', value: 'ivysaur', group: 'Grass' },
-        { label: 'Venusaur', value: 'venusaur', group: 'Grass' },
-        { label: 'Charmander', value: 'charmander', group: 'Fire' },
-        { label: 'Charmeleon', value: 'charmeleon', group: 'Fire' },
-        { label: 'Charizard', value: 'charizard', group: 'Fire' },
-        { label: 'Squirtle', value: 'squirtle', group: 'Water' },
-        { label: 'Wartortle', value: 'wartortle', group: 'Water' },
-        { label: 'Blastoise', value: 'blastoise', group: 'Water' },
-        { label: 'Caterpie', value: 'caterpie', group: 'Bug' },
-        { label: 'Metapod', value: 'metapod', group: 'Bug' },
-        { label: 'Butterfree', value: 'butterfree', group: 'Bug' },
-        { label: 'Weedle', value: 'weedle', group: 'Bug' },
-        { label: 'Kakuna', value: 'kakuna', group: 'Bug' },
-        { label: 'Beedrill', value: 'beedrill', group: 'Bug' },
-        { label: 'Pidgey', value: 'pidgey' },
-        { label: 'Pidgeotto', value: 'pidgeotto' },
-        { label: 'Pidgeot', value: 'pidgeot' },
-        { label: 'Rattata', value: 'rattata' },
-        { label: 'Raticate', value: 'raticate' },
-        { label: 'Spearow', value: 'spearow' },
-        { label: 'Fearow', value: 'fearow' },
-        { label: 'Ekans', value: 'ekans', group: 'Poison' },
-        { label: 'Arbok', value: 'arbok', group: 'Poison' },
-        { label: 'Pikachu', value: 'pikachu', group: 'Electric' },
-        { label: 'Raichu', value: 'raichu', group: 'Electric' },
-        { label: 'Sandshrew', value: 'sandshrew', group: 'Ground' },
-        { label: 'Sandslash', value: 'sandslash', group: 'Ground' },
-        { label: 'Nidoran-f', value: 'nidoran-f', group: 'Poison' },
-        { label: 'Nidorina', value: 'nidorina', group: 'Poison' },
-        { label: 'Nidoqueen', value: 'nidoqueen', group: 'Poison' },
-        { label: 'Nidoran-m', value: 'nidoran-m', group: 'Poison' },
-        { label: 'Nidorino', value: 'nidorino', group: 'Poison' },
-        { label: 'Nidoking', value: 'nidoking', group: 'Poison' },
-        { label: 'Clefairy', value: 'clefairy', group: 'Fairy' },
-        { label: 'Clefable', value: 'clefable', group: 'Fairy' },
-        { label: 'Vulpix', value: 'vulpix', group: 'Fire' },
-        { label: 'Ninetales', value: 'ninetales', group: 'Fire' },
-        { label: 'Jigglypuff', value: 'jigglypuff' },
-        { label: 'Wigglytuff', value: 'wigglytuff' },
-        { label: 'Zubat', value: 'zubat', group: 'Poison' },
-        { label: 'Golbat', value: 'golbat', group: 'Poison' },
-        { label: 'Oddish', value: 'oddish', group: 'Grass' },
-        { label: 'Gloom', value: 'gloom', group: 'Grass' },
-        { label: 'Vileplume', value: 'vileplume', group: 'Grass' },
-        { label: 'Paras', value: 'paras', group: 'Bug' },
-        { label: 'Parasect', value: 'parasect', group: 'Bug' },
-        { label: 'Venonat', value: 'venonat', group: 'Bug' },
-        { label: 'Venomoth', value: 'venomoth', group: 'Bug' },
-        { label: 'Diglett', value: 'diglett', group: 'Ground' }
-      ].sort((a, b) => {
-        if (!a.group || !b.group) return -1
-        return a.group.localeCompare(b.group)
-      })
 
       return (
         <MaterialUI.Container sx={{ pt: 5 }}>
-          <MaterialUI.Autocomplete
-            multiple
-            fullWidth
-            disableCloseOnSelect
-            options={options}
-            groupBy={(option) => option.group}
-            getOptionLabel={(option) => option.label}
-            renderInput={(params) => <MaterialUI.TextField {...params} label="Pokemon" />}
-            renderOption={(props, option, { selected }) => {
-              const { key, ...optionProps } = props
-              return (
-                <li key={key} {...optionProps}>
-                  <MaterialUI.Checkbox checked={selected} />
-                  {option.label}
-                </li>
-              )
-            }}
-            renderTags={(value, getTagProps) => (
-              <React.Fragment>
-                {value.map((option, index) => (
-                  <MaterialUI.Chip label={option.group ? `${option.label} (${option.group})` : option.label} {...getTagProps({ index })} />
-                ))}
-              </React.Fragment>
-            )}
-          />
+          <MaterialUI.Tooltip title="You need admin rights">
+            <span>
+              <MaterialUI.FormControlLabel
+                control={<MaterialUI.Checkbox />}
+                label="Admin feature"
+              />
+            </span>
+          </MaterialUI.Tooltip>
+
+          <MaterialUI.Tooltip title="You need admin rights">
+            <span>
+              <MaterialUI.FormControlLabel
+                control={<MaterialUI.Checkbox disabled />}
+                label="Admin feature"
+              />
+            </span>
+          </MaterialUI.Tooltip>
         </MaterialUI.Container>
       )
     }
