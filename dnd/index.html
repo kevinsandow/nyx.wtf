@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Charakterbogen — Thalia Mondschatten</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0c0b11;
+    --bg-2:#110f1a;
+    --surface:#19172499;
+    --surface-solid:#191724;
+    --surface-2:#221f31;
+    --border:rgba(232,179,57,.16);
+    --border-soft:rgba(255,255,255,.07);
+    --gold:#e8b339;
+    --gold-bright:#f6d27a;
+    --gold-dim:#9a7a2c;
+    --crimson:#d8394c;
+    --crimson-bright:#ff6273;
+    --violet:#9d7ce8;
+    --violet-bright:#c3aaf8;
+    --emerald:#5fb98a;
+    --text:#ece7dd;
+    --text-dim:#9b94a8;
+    --text-faint:#67627a;
+    --r:14px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  body{
+    background:
+      radial-gradient(120% 60% at 50% -8%, #1d1733 0%, rgba(29,23,51,0) 55%),
+      radial-gradient(80% 40% at 50% 110%, #1a0f1a 0%, rgba(0,0,0,0) 60%),
+      var(--bg);
+    min-height:100vh;
+  }
+  button{font-family:inherit;color:inherit;cursor:pointer;border:none;background:none}
+  ::-webkit-scrollbar{width:0;height:0}
+
+  /* ---- App frame (mobile-first, centered on larger screens) ---- */
+  #app{
+    max-width:440px;margin:0 auto;min-height:100vh;
+    display:flex;flex-direction:column;position:relative;
+    background:
+      radial-gradient(100% 30% at 50% 0, rgba(232,179,57,.05), rgba(0,0,0,0) 70%);
+    box-shadow:0 0 0 1px rgba(255,255,255,.03), 0 0 80px rgba(0,0,0,.6);
+  }
+  @media(min-width:480px){ body{padding:18px 0} #app{border-radius:22px;overflow:hidden;min-height:calc(100vh - 36px)} }
+
+  /* ---- Header ---- */
+  header{
+    padding:18px 18px 14px;position:relative;
+    border-bottom:1px solid var(--border-soft);
+    background:linear-gradient(180deg, rgba(232,179,57,.05), rgba(0,0,0,0));
+  }
+  .eyebrow{font-size:10.5px;letter-spacing:.32em;text-transform:uppercase;color:var(--gold-dim);font-weight:700;margin-bottom:6px}
+  h1{font-family:Cinzel,serif;font-weight:900;font-size:25px;line-height:1.05;letter-spacing:.01em;
+     background:linear-gradient(180deg,#fbe6b6,var(--gold) 70%,var(--gold-dim));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .subline{margin-top:7px;font-family:Spectral,serif;font-size:13.5px;color:var(--text-dim);font-style:italic}
+  .insp{position:absolute;top:16px;right:16px;display:flex;flex-direction:column;align-items:center;gap:3px}
+  .insp-gem{width:34px;height:34px;display:grid;place-items:center;border-radius:50%;border:1px solid var(--border);transition:.25s;background:var(--surface-2)}
+  .insp-gem svg{width:17px;height:17px;opacity:.4;transition:.25s}
+  .insp.on .insp-gem{border-color:var(--gold);background:radial-gradient(circle,rgba(232,179,57,.35),rgba(232,179,57,.05));box-shadow:0 0 16px rgba(232,179,57,.5)}
+  .insp.on .insp-gem svg{opacity:1}
+  .insp small{font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-faint);font-weight:700}
+
+  /* ---- Scroll body ---- */
+  main{flex:1;overflow-y:auto;padding:16px 14px 22px}
+  .tab{display:none;animation:fade .3s ease}
+  .tab.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  .sec-title{font-family:Cinzel,serif;font-weight:700;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);
+    display:flex;align-items:center;gap:10px;margin:22px 4px 12px}
+  .sec-title:first-child{margin-top:2px}
+  .sec-title::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)}
+
+  .card{background:var(--surface);border:1px solid var(--border-soft);border-radius:var(--r);backdrop-filter:blur(4px)}
+
+  /* ---- Vital strip ---- */
+  .vitals{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:4px}
+  .vital{background:var(--surface);border:1px solid var(--border-soft);border-radius:var(--r);padding:12px 8px;text-align:center;position:relative}
+  .vital .lbl{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-faint);font-weight:700;margin-bottom:3px}
+  .vital .val{font-size:26px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1}
+  .vital .sub{font-size:10px;color:var(--text-dim);margin-top:2px}
+
+  /* ---- Ability medallions ---- */
+  .abilities{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+  .ability{position:relative;padding:14px 8px 11px;text-align:center;background:var(--surface);
+    border:1px solid var(--border-soft);border-radius:16px;transition:.18s;overflow:hidden}
+  .ability::before{content:"";position:absolute;inset:0;background:radial-gradient(70% 60% at 50% 0,rgba(232,179,57,.07),transparent 70%);pointer-events:none}
+  .ability:active{transform:scale(.96);border-color:var(--gold)}
+  .ability .ab-name{font-family:Cinzel,serif;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold-dim);font-weight:700}
+  .ability .ab-mod{font-size:30px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.05;margin:5px 0 2px}
+  .ability .ab-score{display:inline-block;font-size:11px;font-weight:700;color:var(--text-dim);background:var(--surface-2);
+    border:1px solid var(--border-soft);border-radius:20px;padding:1px 9px;font-variant-numeric:tabular-nums}
+  .roll-hint{position:absolute;bottom:5px;right:7px;font-size:8px;color:var(--text-faint);opacity:.5}
+
+  /* ---- Generic rollable row ---- */
+  .row{display:flex;align-items:center;gap:11px;padding:11px 13px;border-bottom:1px solid var(--border-soft);transition:.15s}
+  .row:last-child{border-bottom:none}
+  .row.tappable:active{background:rgba(232,179,57,.07)}
+  .prof{width:11px;height:11px;border-radius:50%;border:1.5px solid var(--text-faint);flex-shrink:0;transition:.2s}
+  .prof.on{background:var(--gold);border-color:var(--gold);box-shadow:0 0 7px rgba(232,179,57,.6)}
+  .prof.exp{background:var(--violet);border-color:var(--violet);box-shadow:0 0 7px rgba(157,124,232,.6)}
+  .row .name{flex:1;font-size:14px;font-weight:500}
+  .row .name small{color:var(--text-faint);font-weight:600;font-size:10.5px;margin-left:5px;text-transform:uppercase;letter-spacing:.05em}
+  .row .mod{font-size:16px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--gold-bright);min-width:34px;text-align:right}
+  .row .dice-mini{width:15px;height:15px;opacity:.32;flex-shrink:0}
+
+  .meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:4px}
+  .meta{background:var(--surface);border:1px solid var(--border-soft);border-radius:var(--r);padding:12px 14px}
+  .meta .lbl{font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--text-faint);font-weight:700}
+  .meta .val{font-size:19px;font-weight:800;margin-top:3px;font-variant-numeric:tabular-nums}
+  .meta .val small{font-size:12px;color:var(--text-dim);font-weight:600}
+
+  /* ---- HP block ---- */
+  .hp-card{padding:16px;border:1px solid rgba(216,57,76,.25);background:linear-gradient(180deg,rgba(216,57,76,.09),var(--surface-solid))}
+  .hp-top{display:flex;align-items:baseline;justify-content:center;gap:6px;margin-bottom:4px}
+  .hp-cur{font-size:48px;font-weight:800;color:var(--crimson-bright);font-variant-numeric:tabular-nums;line-height:1}
+  .hp-max{font-size:22px;font-weight:700;color:var(--text-faint);font-variant-numeric:tabular-nums}
+  .hp-lbl{text-align:center;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--text-faint);font-weight:700;margin-bottom:13px}
+  .hp-bar{height:7px;border-radius:6px;background:#2a1620;overflow:hidden;margin-bottom:14px}
+  .hp-fill{height:100%;background:linear-gradient(90deg,var(--crimson),var(--crimson-bright));border-radius:6px;transition:width .35s cubic-bezier(.4,0,.2,1);box-shadow:0 0 10px rgba(216,57,76,.5)}
+  .hp-controls{display:flex;gap:8px;align-items:stretch}
+  .hp-controls input{flex:1;min-width:0;background:var(--bg-2);border:1px solid var(--border-soft);border-radius:10px;color:var(--text);
+    text-align:center;font-size:17px;font-weight:700;font-family:inherit;padding:0 6px}
+  .hp-controls input:focus{outline:none;border-color:var(--gold)}
+  .hp-btn{padding:11px 0;border-radius:10px;font-weight:700;font-size:12.5px;letter-spacing:.03em;flex:1;border:1px solid var(--border-soft);transition:.15s}
+  .hp-btn:active{transform:scale(.95)}
+  .hp-btn.dmg{background:rgba(216,57,76,.16);color:var(--crimson-bright);border-color:rgba(216,57,76,.3)}
+  .hp-btn.heal{background:rgba(95,185,138,.15);color:var(--emerald);border-color:rgba(95,185,138,.3)}
+  .hp-extra{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:11px}
+  .hp-extra .meta{display:flex;flex-direction:column;gap:3px;align-items:center;justify-content:space-between}
+  .stepper{display:flex;align-items:center;gap:9px}
+  .stepper button{width:25px;height:25px;border-radius:7px;background:var(--surface-2);border:1px solid var(--border-soft);font-size:16px;font-weight:700;display:grid;place-items:center;color:var(--gold-bright)}
+  .stepper button:active{transform:scale(.9)}
+  .stepper span{min-width:20px;text-align:center;font-weight:800;font-size:17px;font-variant-numeric:tabular-nums}
+
+  /* death saves */
+  .deathsaves{display:none;margin-top:11px;padding:12px 14px;border:1px solid rgba(216,57,76,.3);border-radius:var(--r);background:rgba(216,57,76,.06)}
+  .deathsaves.show{display:block;animation:fade .3s}
+  .ds-row{display:flex;align-items:center;justify-content:space-between;margin-top:9px}
+  .ds-row:first-of-type{margin-top:0}
+  .ds-row .dl{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--text-dim)}
+  .ds-pips{display:flex;gap:7px}
+  .pip{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--text-faint);transition:.18s}
+  .pip.s.on{background:var(--emerald);border-color:var(--emerald);box-shadow:0 0 8px rgba(95,185,138,.5)}
+  .pip.f.on{background:var(--crimson);border-color:var(--crimson);box-shadow:0 0 8px rgba(216,57,76,.5)}
+
+  /* ---- Attacks ---- */
+  .atk{padding:0;overflow:hidden;margin-bottom:10px}
+  .atk-head{display:flex;align-items:center;gap:11px;padding:13px 14px}
+  .atk-head:active{background:rgba(232,179,57,.06)}
+  .atk-head .name{flex:1;font-size:14.5px;font-weight:600}
+  .atk-head .name small{display:block;color:var(--text-faint);font-weight:500;font-size:11px;margin-top:2px;font-style:italic;font-family:Spectral,serif}
+  .atk-stat{text-align:center;min-width:50px}
+  .atk-stat .k{font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-faint);font-weight:700}
+  .atk-stat .v{font-size:15px;font-weight:800;color:var(--gold-bright);font-variant-numeric:tabular-nums}
+  .atk-stat .v.dmg{color:var(--crimson-bright)}
+
+  /* ---- Spells ---- */
+  .spell-head{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:4px}
+  .spell-head .meta{text-align:center;border-color:rgba(157,124,232,.25);background:linear-gradient(180deg,rgba(157,124,232,.08),var(--surface-solid))}
+  .spell-head .meta .val{color:var(--violet-bright)}
+  .slot-card{padding:13px 14px;margin-bottom:10px;border:1px solid rgba(157,124,232,.2)}
+  .slot-row{display:flex;align-items:center;justify-content:space-between}
+  .slot-row .gl{font-family:Cinzel,serif;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--violet-bright);font-weight:700}
+  .slot-pips{display:flex;gap:8px}
+  .slot{width:21px;height:21px;border-radius:6px;transform:rotate(45deg);border:1.5px solid var(--violet);transition:.2s}
+  .slot.full{background:var(--violet);box-shadow:0 0 9px rgba(157,124,232,.55)}
+  .slot:active{transform:rotate(45deg) scale(.85)}
+  .spell{padding:12px 14px;border-bottom:1px solid var(--border-soft)}
+  .spell:last-child{border-bottom:none}
+  .spell .sname{font-size:14px;font-weight:600;display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .spell .stag{font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--violet);font-weight:700;border:1px solid rgba(157,124,232,.3);border-radius:20px;padding:2px 8px;white-space:nowrap}
+  .spell .sdesc{font-family:Spectral,serif;font-size:12.5px;color:var(--text-dim);line-height:1.5;margin-top:5px}
+
+  /* ---- Equipment / traits ---- */
+  .feat{padding:13px 14px;border-bottom:1px solid var(--border-soft)}
+  .feat:last-child{border-bottom:none}
+  .feat .ft{font-family:Cinzel,serif;font-size:13px;font-weight:700;color:var(--gold-bright);letter-spacing:.02em}
+  .feat .fd{font-family:Spectral,serif;font-size:13px;color:var(--text-dim);line-height:1.55;margin-top:5px}
+  .inv-row{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border-soft);font-size:14px}
+  .inv-row:last-child{border-bottom:none}
+  .inv-row .q{color:var(--text-faint);font-variant-numeric:tabular-nums;font-weight:600;font-size:13px}
+  .coins{display:flex;gap:9px;margin-bottom:4px}
+  .coin{flex:1;text-align:center;padding:12px 4px;border-radius:var(--r);border:1px solid var(--border-soft);background:var(--surface)}
+  .coin .cv{font-size:20px;font-weight:800;font-variant-numeric:tabular-nums}
+  .coin .ck{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-faint);font-weight:700;margin-top:2px}
+  .coin.gold .cv{color:var(--gold-bright)}
+  .pers{padding:13px 14px;border-bottom:1px solid var(--border-soft)}
+  .pers:last-child{border-bottom:none}
+  .pers .pl{font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--gold-dim);font-weight:700}
+  .pers .pt{font-family:Spectral,serif;font-style:italic;font-size:13.5px;color:var(--text);line-height:1.5;margin-top:4px}
+
+  /* ---- Bottom nav ---- */
+  nav{position:sticky;bottom:0;display:grid;grid-template-columns:repeat(5,1fr);
+    background:rgba(13,12,18,.92);backdrop-filter:blur(16px);border-top:1px solid var(--border);
+    padding:8px 4px calc(8px + env(safe-area-inset-bottom));z-index:20}
+  .navbtn{display:flex;flex-direction:column;align-items:center;gap:4px;padding:5px 2px;border-radius:10px;transition:.15s}
+  .navbtn svg{width:22px;height:22px;stroke:var(--text-faint);fill:none;stroke-width:1.6;transition:.2s}
+  .navbtn span{font-size:9.5px;letter-spacing:.02em;color:var(--text-faint);font-weight:600;transition:.2s}
+  .navbtn.active svg{stroke:var(--gold)}
+  .navbtn.active span{color:var(--gold-bright)}
+  .navbtn.active{background:radial-gradient(80% 120% at 50% 100%,rgba(232,179,57,.12),transparent)}
+  .navbtn:active{transform:scale(.92)}
+
+  /* ---- Dice roller overlay ---- */
+  #roller{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;
+    background:rgba(6,5,10,.82);backdrop-filter:blur(7px)}
+  #roller.show{display:flex;animation:fade .2s}
+  .roller-box{width:min(86vw,330px);text-align:center;padding:6px}
+  .roll-label{font-family:Cinzel,serif;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:18px}
+  .d20-wrap{position:relative;width:160px;height:160px;margin:0 auto 14px}
+  .d20-wrap svg{width:100%;height:100%;filter:drop-shadow(0 6px 26px rgba(232,179,57,.4))}
+  .d20-num{position:absolute;inset:0;display:grid;place-items:center;font-family:Cinzel,serif;font-weight:900;
+    font-size:50px;color:#1a1206;padding-top:14px}
+  .d20-wrap.rolling{animation:tumble .55s cubic-bezier(.3,.1,.3,1)}
+  @keyframes tumble{0%{transform:rotate(0) scale(.7)}55%{transform:rotate(380deg) scale(1.12)}100%{transform:rotate(360deg) scale(1)}}
+  .roll-breakdown{font-size:14px;color:var(--text-dim);font-weight:500;font-variant-numeric:tabular-nums;min-height:20px}
+  .roll-breakdown b{color:var(--text);font-weight:700}
+  .roll-total{font-size:15px;margin-top:6px;color:var(--text-dim);font-weight:600}
+  .roll-total .tt{font-size:40px;font-weight:800;color:var(--gold-bright);font-variant-numeric:tabular-nums;display:block;line-height:1.1}
+  .crit{color:var(--emerald)!important}.crit-bg path.face{fill:var(--emerald)!important}
+  .fumble{color:var(--crimson-bright)!important}.fumble-bg path.face{fill:var(--crimson)!important}
+  .roll-flag{font-family:Cinzel,serif;font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-size:12px;margin-top:4px;min-height:16px}
+  .adv-btns{display:flex;gap:9px;margin-top:20px}
+  .adv-btns button{flex:1;padding:11px 0;border-radius:11px;font-size:12px;font-weight:700;letter-spacing:.04em;
+    background:var(--surface-2);border:1px solid var(--border-soft);transition:.15s}
+  .adv-btns button:active{transform:scale(.95)}
+  .adv-btns .adv{color:var(--emerald);border-color:rgba(95,185,138,.3)}
+  .adv-btns .dis{color:var(--crimson-bright);border-color:rgba(216,57,76,.3)}
+  .adv-btns .close{color:var(--gold-bright);border-color:var(--border)}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="eyebrow">Charakterbogen</div>
+    <h1 id="charname">Thalia Mondschatten</h1>
+    <div class="subline" id="charsub">Halbelfen-Waldläuferin · Stufe 5 · Außenseiterin</div>
+    <button class="insp" id="inspBtn" aria-label="Inspiration umschalten">
+      <span class="insp-gem"><svg viewBox="0 0 24 24" fill="#f6d27a" stroke="none"><path d="M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4z"/></svg></span>
+      <small>Inspiration</small>
+    </button>
+  </header>
+
+  <main id="main"></main>
+
+  <nav id="nav"></nav>
+</div>
+
+<!-- Dice roller -->
+<div id="roller">
+  <div class="roller-box">
+    <div class="roll-label" id="rLabel">Probe</div>
+    <div class="d20-wrap" id="d20wrap">
+      <svg viewBox="0 0 100 100" id="d20svg">
+        <polygon class="face" points="50,4 89.8,27 89.8,73 50,96 10.2,73 10.2,27"
+          fill="url(#gg)" stroke="#5a4715" stroke-width="1.5"/>
+        <polygon points="50,18 76,62 24,62" fill="rgba(0,0,0,.16)" stroke="#7a5f1c" stroke-width="1"/>
+        <path d="M50,4 L50,18 M89.8,27 L76,62 M10.2,27 L24,62 M89.8,73 L76,62 M10.2,73 L24,62 M50,96 L50,62 M50,62 L24,62 M50,62 L76,62"
+          stroke="#7a5f1c" stroke-width=".9" fill="none" opacity=".55"/>
+        <defs><linearGradient id="gg" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#fbe6b4"/><stop offset=".55" stop-color="#e8b339"/><stop offset="1" stop-color="#b8881f"/>
+        </linearGradient></defs>
+      </svg>
+      <div class="d20-num" id="d20num">20</div>
+    </div>
+    <div class="roll-breakdown" id="rBreak"></div>
+    <div class="roll-flag" id="rFlag"></div>
+    <div class="roll-total" id="rTotal"></div>
+    <div class="adv-btns">
+      <button class="adv" id="advBtn">Vorteil</button>
+      <button class="dis" id="disBtn">Nachteil</button>
+      <button class="close" id="closeBtn">Schließen</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============== CHARACTER DATA ============== */
+const C = {
+  prof: 3,
+  abilities: [
+    {key:"st", name:"Stärke",          score:12},
+    {key:"ge", name:"Geschicklichkeit",score:17},
+    {key:"ko", name:"Konstitution",    score:14},
+    {key:"in", name:"Intelligenz",     score:10},
+    {key:"we", name:"Weisheit",        score:14},
+    {key:"ch", name:"Charisma",        score:12},
+  ],
+  saves: ["st","ge"], // proficient saving throws
+  hp:{max:44, cur:44, temp:0},
+  ac:15, speed:"9 m",
+  hitDice:{total:5, cur:5, die:"W10"},
+  skills:[
+    {n:"Akrobatik",         a:"ge"}, {n:"Arkane Kunde",     a:"in"},
+    {n:"Athletik",          a:"st", p:1}, {n:"Auftreten",   a:"ch"},
+    {n:"Einschüchtern",     a:"ch"}, {n:"Fingerfertigkeit", a:"ge"},
+    {n:"Geschichte",        a:"in"}, {n:"Heilkunde",        a:"we"},
+    {n:"Heimlichkeit",      a:"ge", p:2}, {n:"Mit Tieren umgehen", a:"we", p:1},
+    {n:"Motiv erkennen",    a:"we"}, {n:"Nachforschungen",  a:"in"},
+    {n:"Naturkunde",        a:"in", p:1}, {n:"Religion",     a:"in"},
+    {n:"Täuschen",          a:"ch"}, {n:"Überlebenskunst",  a:"we", p:1},
+    {n:"Überzeugen",        a:"ch"}, {n:"Wahrnehmung",      a:"we", p:1},
+  ],
+  attacks:[
+    {n:"Langbogen", note:"Fernkampf · 45/180 m · Bogenschießen +2", atk:8, dmg:"1W8+3", dtype:"Stich"},
+    {n:"Kurzschwert (Haupthand)", note:"Nahkampf · Finesse, leicht", atk:6, dmg:"1W6+3", dtype:"Stich"},
+    {n:"Kurzschwert (Beidhändig)", note:"Bonusaktion · Finesse, leicht", atk:6, dmg:"1W6", dtype:"Stich"},
+    {n:"Dolch", note:"Nahkampf/Wurf · 6/18 m", atk:6, dmg:"1W4+3", dtype:"Stich"},
+  ],
+  spell:{dc:13, atk:5, ability:"Weisheit"},
+  slots:[ {lvl:"1. Grad", total:4}, {lvl:"2. Grad", total:2} ],
+  spells:[
+    {n:"Jägermal", tag:"1. Grad", d:"Markiere eine Kreatur. Du verursachst +1W6 Schaden mit Waffenangriffen gegen sie und hast Vorteil beim Aufspüren."},
+    {n:"Wunden heilen", tag:"1. Grad", d:"Eine berührte Kreatur erhält 1W8 + Wirkmodifikator Trefferpunkte zurück."},
+    {n:"Zauberbeere", tag:"1. Grad", d:"Erschaffe 10 nährende Beeren; jede heilt 1 TP und sättigt für einen Tag."},
+    {n:"Tierbotschaft", tag:"2. Grad", d:"Ein kleines Tier überbringt eine Nachricht von bis zu 25 Wörtern an einen genannten Ort."},
+    {n:"Dorngewächs", tag:"2. Grad", d:"Lässt auf 6 m schwierigen, dornigen Boden entstehen, der pro 1,5 m Bewegung 2W4 Stichschaden verursacht."},
+  ],
+  features:[
+    {t:"Kampfstil: Bogenschießen", d:"Du erhältst +2 auf Angriffswürfe mit Fernkampfwaffen (bereits in den Werten enthalten)."},
+    {t:"Bevorzugter Feind: Ungeheuer", d:"Vorteil bei Weisheits-(Überlebenskunst)-Würfen, um Ungeheuer aufzuspüren, und bei Intelligenzwürfen, dich an sie zu erinnern."},
+    {t:"Naturkundiger Entdecker: Wald", d:"In Wäldern wirst du beim Reisen nicht erschöpft; deine Gruppe bleibt aufmerksam und kann sich nicht verirren."},
+    {t:"Jägerpfad: Kolossschläger", d:"Einmal pro Runde +1W8 Schaden gegen eine verletzte Kreatur, die du mit einer Waffe triffst."},
+    {t:"Primitives Bewusstsein", d:"Verbrauche einen Zauberplatz, um zu spüren, ob bestimmte Kreaturentypen in der Umgebung sind."},
+  ],
+  inventory:[
+    {n:"Beschlagene Lederrüstung", q:"getragen"}, {n:"Kurzschwert", q:"×2"},
+    {n:"Langbogen", q:"×1"}, {n:"Pfeile", q:"20"},
+    {n:"Entdeckerpaket", q:"×1"}, {n:"Jagdfalle", q:"×1"},
+    {n:"Wickelumhang & Reisekleidung", q:"×1"}, {n:"Trophäe: Zahn eines Ungeheuers", q:"×1"},
+  ],
+  coins:{gm:15, sm:8, km:24},
+  persona:[
+    {l:"Persönlichkeitsmerkmal", t:"Ich fühle mich in der Wildnis weit wohler als zwischen Stadtmauern."},
+    {l:"Ideal", t:"Das Gleichgewicht. Die Natur kennt ihre Ordnung — meine Aufgabe ist es, sie zu wahren."},
+    {l:"Bindung", t:"Ich beschütze die Lichtung, in der ich aufgewachsen bin, mit meinem Leben."},
+    {l:"Makel", t:"Ich vertraue Fremden nur langsam und spreche oft zu unverblümt."},
+  ],
+};
+
+/* ============== HELPERS ============== */
+const mod = s => Math.floor((s-10)/2);
+const fmt = n => (n>=0?"+":"")+n;
+const abMod = key => mod(C.abilities.find(a=>a.key===key).score);
+const $ = (s,el=document)=>el.querySelector(s);
+const ce = (t,c,h)=>{const e=document.createElement(t); if(c)e.className=c; if(h!=null)e.innerHTML=h; return e;};
+
+/* ============== STATE ============== */
+let state = {
+  hp:{...C.hp},
+  hitDice:C.hitDice.cur,
+  inspiration:false,
+  slots: C.slots.map(s=>s.total),
+  death:{s:0,f:0},
+};
+
+/* ============== DICE ROLLER ============== */
+const roller=$("#roller"), d20wrap=$("#d20wrap"), d20num=$("#d20num"),
+      d20svg=$("#d20svg"), rLabel=$("#rLabel"), rBreak=$("#rBreak"),
+      rTotal=$("#rTotal"), rFlag=$("#rFlag");
+let curRoll=null;
+
+function rollDie(n){return Math.floor(Math.random()*n)+1;}
+
+function showRoll(label, modifier){
+  curRoll={label, modifier};
+  rLabel.textContent=label;
+  roller.classList.add("show");
+  doD20(modifier, 0);
+}
+function doD20(modifier, mode){ // mode 0 normal, 1 adv, -1 dis
+  d20svg.classList.remove("crit-bg","fumble-bg");
+  rFlag.textContent=""; rTotal.innerHTML=""; rBreak.textContent="";
+  d20wrap.classList.remove("rolling"); void d20wrap.offsetWidth; d20wrap.classList.add("rolling");
+
+  let r1=rollDie(20), r2=rollDie(20), nat;
+  if(mode===1) nat=Math.max(r1,r2);
+  else if(mode===-1) nat=Math.min(r1,r2);
+  else nat=r1;
+
+  // tumble animation
+  let ticks=0;
+  const spin=setInterval(()=>{ d20num.textContent=rollDie(20); if(++ticks>8){clearInterval(spin); land();} },55);
+
+  function land(){
+    d20num.textContent=nat;
+    const total=nat+modifier;
+    d20num.classList.remove("crit","fumble");
+    let modeTxt = mode===1?" · Vorteil":mode===-1?" · Nachteil":"";
+    let dice = mode!==0 ? `(${r1}, ${r2}) → ${nat}` : `${nat}`;
+    rBreak.innerHTML = `Wurf <b>${dice}</b> ${fmt(modifier)}${modeTxt}`;
+    rTotal.innerHTML = `<span class="tt">${total}</span>`;
+    if(nat===20){ d20svg.classList.add("crit-bg"); d20num.classList.add("crit"); rFlag.textContent="Natürliche 20!"; rFlag.className="roll-flag crit"; }
+    else if(nat===1){ d20svg.classList.add("fumble-bg"); d20num.classList.add("fumble"); rFlag.textContent="Patzer!"; rFlag.className="roll-flag fumble"; }
+    else rFlag.className="roll-flag";
+  }
+}
+function rollDamage(label, formula){ // e.g. "1W8+3"
+  curRoll=null;
+  rLabel.textContent=label+" — Schaden";
+  roller.classList.add("show");
+  d20svg.classList.remove("crit-bg","fumble-bg");
+  rFlag.textContent=""; d20num.classList.remove("crit","fumble");
+  d20wrap.classList.remove("rolling"); void d20wrap.offsetWidth; d20wrap.classList.add("rolling");
+  const m=formula.match(/(\d+)W(\d+)(?:\+(\d+))?/i);
+  const num=+m[1], die=+m[2], bonus=m[3]?+m[3]:0;
+  let ticks=0;
+  const spin=setInterval(()=>{ d20num.textContent=rollDie(die); if(++ticks>8){clearInterval(spin); land();} },55);
+  function land(){
+    let rolls=[],sum=0; for(let i=0;i<num;i++){const r=rollDie(die);rolls.push(r);sum+=r;}
+    const total=sum+bonus;
+    d20num.textContent=total;
+    rBreak.innerHTML=`${formula} → <b>${rolls.join(" + ")}</b>${bonus?" + "+bonus:""}`;
+    rTotal.innerHTML=`<span class="tt" style="color:var(--crimson-bright)">${total}</span>`;
+  }
+}
+$("#advBtn").onclick=()=>{ if(curRoll) doD20(curRoll.modifier,1); };
+$("#disBtn").onclick=()=>{ if(curRoll) doD20(curRoll.modifier,-1); };
+$("#closeBtn").onclick=()=>roller.classList.remove("show");
+roller.onclick=e=>{ if(e.target===roller) roller.classList.remove("show"); };
+
+/* hide adv buttons for damage rolls */
+const advWrap=$(".adv-btns .adv"), disWrap=$(".adv-btns .dis");
+function setAdvVisible(v){ advWrap.style.display=v?"":"none"; disWrap.style.display=v?"":"none"; }
+
+/* dice icon */
+const diceIcon=`<svg class="dice-mini" viewBox="0 0 100 100"><polygon points="50,8 86,29 86,71 50,92 14,71 14,29" fill="none" stroke="#e8b339" stroke-width="6"/><text x="50" y="64" text-anchor="middle" font-size="38" font-weight="800" fill="#e8b339" font-family="Inter">20</text></svg>`;
+
+/* ============== TAB BUILDERS ============== */
+function tabUebersicht(){
+  const t=ce("div","tab active"); t.id="t-ueber";
+  // vitals
+  const v=ce("div","vitals");
+  v.appendChild(ce("div","vital",`<div class="lbl">Rüstungsklasse</div><div class="val">${C.ac}</div><div class="sub">RK</div>`));
+  v.appendChild(ce("div","vital",`<div class="lbl">Initiative</div><div class="val">${fmt(abMod("ge"))}</div><div class="sub">Geschicklichkeit</div>`));
+  v.appendChild(ce("div","vital",`<div class="lbl">Übungsbonus</div><div class="val">${fmt(C.prof)}</div><div class="sub">Stufe 5</div>`));
+  const vInit=v.children[1]; vInit.classList.add("tappable"); vInit.style.cursor="pointer";
+  vInit.onclick=()=>{setAdvVisible(true);showRoll("Initiative",abMod("ge"));};
+  t.appendChild(v);
+
+  t.appendChild(ce("div","sec-title",`Attribute <span style="font-family:Spectral;font-style:italic;text-transform:none;letter-spacing:0;font-weight:400;color:var(--text-faint);font-size:11px">tippen zum Würfeln</span>`));
+  const ab=ce("div","abilities");
+  C.abilities.forEach(a=>{
+    const m=mod(a.score);
+    const el=ce("button","ability",
+      `<div class="ab-name">${a.name.slice(0,12)}</div><div class="ab-mod">${fmt(m)}</div><div class="ab-score">${a.score}</div><span class="roll-hint">d20</span>`);
+    el.onclick=()=>{setAdvVisible(true);showRoll(a.name+" — Probe",m);};
+    ab.appendChild(el);
+  });
+  t.appendChild(ab);
+
+  // saving throws
+  t.appendChild(ce("div","sec-title","Rettungswürfe"));
+  const sv=ce("div","card");
+  C.abilities.forEach(a=>{
+    const isP=C.saves.includes(a.key);
+    const m=mod(a.score)+(isP?C.prof:0);
+    const r=ce("div","row tappable",
+      `<span class="prof ${isP?"on":""}"></span><span class="name">${a.name}</span><span class="mod">${fmt(m)}</span>${diceIcon}`);
+    r.onclick=()=>{setAdvVisible(true);showRoll(a.name+" — Rettungswurf",m);};
+    sv.appendChild(r);
+  });
+  t.appendChild(sv);
+
+  // passive + senses
+  const pp=10+abMod("we")+C.prof;
+  t.appendChild(ce("div","sec-title","Sinne"));
+  const mg=ce("div","meta-grid");
+  mg.appendChild(ce("div","meta",`<div class="lbl">Passive Wahrnehmung</div><div class="val">${pp}</div>`));
+  mg.appendChild(ce("div","meta",`<div class="lbl">Bewegungsrate</div><div class="val">${C.speed}</div>`));
+  t.appendChild(mg);
+  return t;
+}
+
+function tabKampf(){
+  const t=ce("div","tab"); t.id="t-kampf";
+  // HP card
+  const hp=ce("div","card hp-card");
+  hp.innerHTML=`
+    <div class="hp-top"><span class="hp-cur" id="hpCur">${state.hp.cur}</span><span class="hp-max">/ ${state.hp.max}</span></div>
+    <div class="hp-lbl" id="hpLbl">Trefferpunkte</div>
+    <div class="hp-bar"><div class="hp-fill" id="hpFill"></div></div>
+    <div class="hp-controls">
+      <button class="hp-btn dmg" id="dmgBtn">Schaden</button>
+      <input id="hpInput" type="number" inputmode="numeric" placeholder="0">
+      <button class="hp-btn heal" id="healBtn">Heilen</button>
+    </div>
+    <div class="hp-extra">
+      <div class="meta"><div><div class="lbl">Temporäre TP</div></div>
+        <div class="stepper"><button id="tmDn">−</button><span id="tmpVal">${state.hp.temp}</span><button id="tmUp">+</button></div></div>
+      <div class="meta"><div><div class="lbl">Trefferwürfel ${C.hitDice.die}</div></div>
+        <div class="stepper"><button id="hdSpend">⚅</button><span id="hdVal">${state.hitDice}/${C.hitDice.total}</span><button id="hdUp">+</button></div></div>
+    </div>`;
+  t.appendChild(hp);
+
+  // death saves
+  const ds=ce("div","deathsaves"); ds.id="deathSaves";
+  ds.innerHTML=`<div class="ds-row"><span class="dl">Erfolge</span><div class="ds-pips" id="dsS"></div></div>
+                <div class="ds-row"><span class="dl">Misserfolge</span><div class="ds-pips" id="dsF"></div></div>`;
+  t.appendChild(ds);
+
+  // combat meta
+  const mg=ce("div","meta-grid"); mg.style.marginTop="11px";
+  const acm=ce("div","meta",`<div class="lbl">Rüstungsklasse</div><div class="val">${C.ac}</div>`);
+  const initm=ce("div","meta tappable",`<div class="lbl">Initiative</div><div class="val">${fmt(abMod("ge"))}</div>`);
+  initm.style.cursor="pointer"; initm.onclick=()=>{setAdvVisible(true);showRoll("Initiative",abMod("ge"));};
+  mg.appendChild(acm); mg.appendChild(initm);
+  t.appendChild(mg);
+
+  // attacks
+  t.appendChild(ce("div","sec-title","Angriffe"));
+  C.attacks.forEach(a=>{
+    const card=ce("div","card atk");
+    const head=ce("div","atk-head",
+      `<span class="name">${a.n}<small>${a.note}</small></span>
+       <span class="atk-stat"><div class="k">Treffer</div><div class="v">${fmt(a.atk)}</div></span>`);
+    const dmgBtn=ce("button","atk-stat",`<div class="k">Schaden</div><div class="v dmg">${a.dmg}</div>`);
+    dmgBtn.onclick=e=>{e.stopPropagation();setAdvVisible(true);rollDamage(a.n,a.dmg);};
+    head.appendChild(dmgBtn);
+    head.onclick=()=>{setAdvVisible(true);showRoll(a.n+" — Angriff",a.atk);};
+    card.appendChild(head);
+    t.appendChild(card);
+  });
+
+  // combat features
+  t.appendChild(ce("div","sec-title","Kampffähigkeiten"));
+  const fc=ce("div","card");
+  C.features.slice(2,5).forEach(f=> fc.appendChild(ce("div","feat",`<div class="ft">${f.t}</div><div class="fd">${f.d}</div>`)));
+  t.appendChild(fc);
+  return t;
+}
+
+function tabFert(){
+  const t=ce("div","tab"); t.id="t-fert";
+  t.appendChild(ce("div","sec-title",`Fertigkeiten <span style="font-family:Spectral;font-style:italic;text-transform:none;letter-spacing:0;font-weight:400;color:var(--text-faint);font-size:11px">tippen zum Würfeln</span>`));
+  const card=ce("div","card");
+  const abShort={st:"STÄ",ge:"GES",ko:"KON",in:"INT",we:"WEI",ch:"CHA"};
+  C.skills.forEach(s=>{
+    const base=abMod(s.a);
+    const bonus = s.p===2 ? C.prof*2 : s.p===1 ? C.prof : 0;
+    const m=base+bonus;
+    const dot = s.p===2?"prof exp":s.p?"prof on":"prof";
+    const r=ce("div","row tappable",
+      `<span class="${dot}"></span><span class="name">${s.n}<small>${abShort[s.a]}</small></span><span class="mod">${fmt(m)}</span>${diceIcon}`);
+    r.onclick=()=>{setAdvVisible(true);showRoll(s.n,m);};
+    card.appendChild(r);
+  });
+  t.appendChild(card);
+  const legend=ce("div");legend.style.cssText="display:flex;gap:16px;justify-content:center;margin-top:14px;font-size:11px;color:var(--text-faint)";
+  legend.innerHTML=`<span style="display:flex;align-items:center;gap:6px"><span class="prof on" style="position:static"></span> Übung</span>
+                    <span style="display:flex;align-items:center;gap:6px"><span class="prof exp" style="position:static"></span> Expertise</span>`;
+  t.appendChild(legend);
+  return t;
+}
+
+function tabZauber(){
+  const t=ce("div","tab"); t.id="t-zauber";
+  const sh=ce("div","spell-head");
+  sh.appendChild(ce("div","meta",`<div class="lbl">Wirkmerkmal</div><div class="val">${C.spell.ability.slice(0,3)}.</div>`));
+  const dcm=ce("div","meta",`<div class="lbl">Zauber-SG</div><div class="val">${C.spell.dc}</div>`);
+  const atkm=ce("div","meta tappable",`<div class="lbl">Angriff</div><div class="val">${fmt(C.spell.atk)}</div>`);
+  atkm.style.cursor="pointer"; atkm.onclick=()=>{setAdvVisible(true);showRoll("Zauberangriff",C.spell.atk);};
+  sh.appendChild(dcm); sh.appendChild(atkm);
+  t.appendChild(sh);
+
+  t.appendChild(ce("div","sec-title","Zauberplätze"));
+  C.slots.forEach((s,i)=>{
+    const sc=ce("div","card slot-card");
+    const row=ce("div","slot-row");
+    row.appendChild(ce("span","gl",s.lvl));
+    const pips=ce("div","slot-pips");
+    for(let j=0;j<s.total;j++){
+      const p=ce("button","slot full"); p.dataset.lvl=i; p.dataset.idx=j;
+      pips.appendChild(p);
+    }
+    row.appendChild(pips); sc.appendChild(row);
+    sc.querySelector(".slot-pips").onclick=e=>{
+      const p=e.target.closest(".slot"); if(!p)return;
+      const lvl=+p.dataset.lvl;
+      const filled=Array.from(pips.querySelectorAll(".slot")).filter(x=>x.classList.contains("full")).length;
+      const idx=+p.dataset.idx;
+      // toggle: if this is filled, spend down to it; else restore up to it
+      if(p.classList.contains("full")){ // spend from the right
+        for(let k=C.slots[lvl].total-1;k>=idx;k--) pips.children[k].classList.remove("full");
+      } else { for(let k=0;k<=idx;k++) pips.children[k].classList.add("full"); }
+      state.slots[lvl]=Array.from(pips.querySelectorAll(".slot")).filter(x=>x.classList.contains("full")).length;
+    };
+    t.appendChild(sc);
+  });
+
+  t.appendChild(ce("div","sec-title","Bekannte Zauber"));
+  const card=ce("div","card");
+  C.spells.forEach(s=> card.appendChild(ce("div","spell",
+    `<div class="sname">${s.n}<span class="stag">${s.tag}</span></div><div class="sdesc">${s.d}</div>`)));
+  t.appendChild(card);
+  return t;
+}
+
+function tabAusr(){
+  const t=ce("div","tab"); t.id="t-ausr";
+  t.appendChild(ce("div","sec-title","Vermögen"));
+  const coins=ce("div","coins");
+  coins.appendChild(ce("div","coin gold",`<div class="cv">${C.coins.gm}</div><div class="ck">Gold</div>`));
+  coins.appendChild(ce("div","coin",`<div class="cv">${C.coins.sm}</div><div class="ck">Silber</div>`));
+  coins.appendChild(ce("div","coin",`<div class="cv">${C.coins.km}</div><div class="ck">Kupfer</div>`));
+  t.appendChild(coins);
+
+  t.appendChild(ce("div","sec-title","Ausrüstung"));
+  const inv=ce("div","card");
+  C.inventory.forEach(i=> inv.appendChild(ce("div","inv-row",`<span>${i.n}</span><span class="q">${i.q}</span>`)));
+  t.appendChild(inv);
+
+  t.appendChild(ce("div","sec-title","Merkmale & Fähigkeiten"));
+  const fc=ce("div","card");
+  C.features.slice(0,2).forEach(f=> fc.appendChild(ce("div","feat",`<div class="ft">${f.t}</div><div class="fd">${f.d}</div>`)));
+  t.appendChild(fc);
+
+  t.appendChild(ce("div","sec-title","Charakter"));
+  const pc=ce("div","card");
+  C.persona.forEach(p=> pc.appendChild(ce("div","pers",`<div class="pl">${p.l}</div><div class="pt">„${p.t}“</div>`)));
+  t.appendChild(pc);
+  return t;
+}
+
+/* ============== NAV ============== */
+const TABS=[
+  {id:"ueber", label:"Übersicht", build:tabUebersicht,
+   icon:`<path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/>`},
+  {id:"kampf", label:"Kampf", build:tabKampf,
+   icon:`<path d="M5 19l5-5M19 5l-4 4M14.5 9.5L19 5M3 21l4-1 11-11-3-3L4 17z"/><path d="M16 8l3 3"/>`},
+  {id:"fert", label:"Fertigkeiten", build:tabFert,
+   icon:`<path d="M5 4h11l3 3v13H5z"/><path d="M8 9h8M8 13h8M8 17h5"/>`},
+  {id:"zauber", label:"Zauber", build:tabZauber,
+   icon:`<path d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/><path d="M18 14l1 2.5L21.5 18 19 19l-1 2.5L17 19l-2.5-1 2.5-1z"/>`},
+  {id:"ausr", label:"Ausrüstung", build:tabAusr,
+   icon:`<path d="M8 7V5a4 4 0 018 0v2"/><path d="M5 7h14l-1 13H6z"/><path d="M9 11v0M15 11v0"/>`},
+];
+const main=$("#main"), nav=$("#nav");
+TABS.forEach((tab,i)=>{
+  main.appendChild(tab.build());
+  const b=ce("button","navbtn"+(i===0?" active":""),
+    `<svg viewBox="0 0 24 24">${tab.icon}</svg><span>${tab.label}</span>`);
+  b.onclick=()=>{
+    document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+    $("#t-"+tab.id).classList.add("active");
+    document.querySelectorAll(".navbtn").forEach(x=>x.classList.remove("active"));
+    b.classList.add("active");
+    main.scrollTo({top:0,behavior:"smooth"});
+  };
+  nav.appendChild(b);
+});
+
+/* ============== INSPIRATION ============== */
+$("#inspBtn").onclick=()=>{
+  state.inspiration=!state.inspiration;
+  $("#inspBtn").classList.toggle("on",state.inspiration);
+};
+
+/* ============== HP LOGIC ============== */
+function renderHP(){
+  const cur=$("#hpCur"), fill=$("#hpFill"), lbl=$("#hpLbl");
+  if(!cur)return;
+  cur.textContent=state.hp.cur;
+  const pct=Math.max(0,Math.min(100, state.hp.cur/state.hp.max*100));
+  fill.style.width=pct+"%";
+  fill.style.background = pct<=25 ? "linear-gradient(90deg,#7a1020,var(--crimson))"
+    : pct<=50 ? "linear-gradient(90deg,var(--crimson),#e8843b)"
+    : "linear-gradient(90deg,var(--crimson),var(--crimson-bright))";
+  $("#tmpVal").textContent=state.hp.temp;
+  $("#hdVal").textContent=state.hitDice+"/"+C.hitDice.total;
+  lbl.textContent = state.hp.cur<=0 ? "Bewusstlos — Todesrettungswürfe" : "Trefferpunkte";
+  $("#deathSaves").classList.toggle("show", state.hp.cur<=0);
+}
+function renderDeath(){
+  const S=$("#dsS"), F=$("#dsF"); if(!S)return;
+  S.innerHTML=""; F.innerHTML="";
+  for(let i=0;i<3;i++){ const p=ce("button","pip s"+(i<state.death.s?" on":"")); p.onclick=()=>{state.death.s=(state.death.s===i+1?i:i+1);renderDeath();}; S.appendChild(p);}
+  for(let i=0;i<3;i++){ const p=ce("button","pip f"+(i<state.death.f?" on":"")); p.onclick=()=>{state.death.f=(state.death.f===i+1?i:i+1);renderDeath();}; F.appendChild(p);}
+}
+function applyHP(sign){
+  const inp=$("#hpInput"); let n=parseInt(inp.value,10);
+  if(isNaN(n)||n<=0){inp.value="";return;}
+  if(sign<0){ // damage hits temp first
+    if(state.hp.temp>0){ const absorbed=Math.min(state.hp.temp,n); state.hp.temp-=absorbed; n-=absorbed; }
+    state.hp.cur=Math.max(0,state.hp.cur-n);
+  } else {
+    state.hp.cur=Math.min(state.hp.max,state.hp.cur+n);
+    if(state.hp.cur>0){state.death={s:0,f:0};}
+  }
+  inp.value=""; inp.blur(); renderHP(); renderDeath();
+}
+function wireHP(){
+  $("#dmgBtn").onclick=()=>applyHP(-1);
+  $("#healBtn").onclick=()=>applyHP(1);
+  $("#hpInput").addEventListener("keydown",e=>{if(e.key==="Enter")applyHP(1);});
+  $("#tmUp").onclick=()=>{state.hp.temp++;renderHP();};
+  $("#tmDn").onclick=()=>{state.hp.temp=Math.max(0,state.hp.temp-1);renderHP();};
+  $("#hdUp").onclick=()=>{state.hitDice=Math.min(C.hitDice.total,state.hitDice+1);renderHP();};
+  $("#hdSpend").onclick=()=>{
+    if(state.hitDice<=0)return;
+    state.hitDice--;
+    const r=rollDie(10)+abMod("ko");
+    state.hp.cur=Math.min(state.hp.max,state.hp.cur+Math.max(1,r));
+    renderHP();
+    setAdvVisible(false);
+    rLabel.textContent="Kurze Rast — "+C.hitDice.die;
+    roller.classList.add("show"); d20svg.classList.remove("crit-bg","fumble-bg");
+    d20wrap.classList.remove("rolling");void d20wrap.offsetWidth;d20wrap.classList.add("rolling");
+    d20num.textContent=Math.max(1,r);
+    rBreak.innerHTML=`1W10 ${fmt(abMod("ko"))} → geheilt`;
+    rTotal.innerHTML=`<span class="tt" style="color:var(--emerald)">+${Math.max(1,r)}</span>`;
+    rFlag.textContent="";
+  };
+}
+wireHP(); renderHP(); renderDeath();
+</script>
+</body>
+</html>
