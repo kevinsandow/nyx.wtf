@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Charakterbogen — Thalia Mondschatten</title>
+<title>Charakterbogen — Thariel Meliamne</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -264,8 +264,8 @@
 <div id="app">
   <header>
     <div class="eyebrow">Charakterbogen</div>
-    <h1 id="charname">Thalia Mondschatten</h1>
-    <div class="subline" id="charsub">Halbelfen-Waldläuferin · Stufe 5 · Außenseiterin</div>
+    <h1 id="charname">Thariel Meliamne</h1>
+    <div class="subline" id="charsub">Hochelf-Magier · Stufe 1 · „Cantor“, der Stillsänger</div>
     <button class="insp" id="inspBtn" aria-label="Inspiration umschalten">
       <span class="insp-gem"><svg viewBox="0 0 24 24" fill="#f6d27a" stroke="none"><path d="M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4z"/></svg></span>
       <small>Inspiration</small>
@@ -328,67 +328,74 @@
 <script>
 /* ============== CHARACTER DATA ============== */
 const C = {
-  prof: 3,
+  prof: 2,
   abilities: [
-    {key:"st", name:"Stärke",          score:12},
-    {key:"ge", name:"Geschicklichkeit",score:17},
-    {key:"ko", name:"Konstitution",    score:14},
-    {key:"in", name:"Intelligenz",     score:10},
-    {key:"we", name:"Weisheit",        score:14},
-    {key:"ch", name:"Charisma",        score:12},
+    {key:"st", name:"Stärke",          score:8},
+    {key:"ge", name:"Geschicklichkeit",score:16},
+    {key:"ko", name:"Konstitution",    score:16},
+    {key:"in", name:"Intelligenz",     score:16},
+    {key:"we", name:"Weisheit",        score:8},
+    {key:"ch", name:"Charisma",        score:8},
   ],
-  saves: ["st","ge"], // proficient saving throws
-  hp:{max:44, cur:44, temp:0},
-  ac:15, speed:"9 m",
-  hitDice:{total:5, cur:5, die:"W10"},
+  saves: ["in","we"], // proficient saving throws (Magier: Int & Wis)
+  hp:{max:9, cur:9, temp:0},
+  ac:13, speed:"9 m",
+  hitDice:{total:1, cur:1, die:"W6"},
   skills:[
-    {n:"Akrobatik",         a:"ge"}, {n:"Arkane Kunde",     a:"in"},
-    {n:"Athletik",          a:"st", p:1}, {n:"Auftreten",   a:"ch"},
+    {n:"Akrobatik",         a:"ge"}, {n:"Arkane Kunde",     a:"in", p:1},
+    {n:"Athletik",          a:"st"}, {n:"Auftreten",        a:"ch"},
     {n:"Einschüchtern",     a:"ch"}, {n:"Fingerfertigkeit", a:"ge"},
-    {n:"Geschichte",        a:"in"}, {n:"Heilkunde",        a:"we"},
-    {n:"Heimlichkeit",      a:"ge", p:2}, {n:"Mit Tieren umgehen", a:"we", p:1},
-    {n:"Motiv erkennen",    a:"we"}, {n:"Nachforschungen",  a:"in"},
-    {n:"Naturkunde",        a:"in", p:1}, {n:"Religion",     a:"in"},
-    {n:"Täuschen",          a:"ch"}, {n:"Überlebenskunst",  a:"we", p:1},
+    {n:"Geschichte",        a:"in", p:1}, {n:"Heilkunde",   a:"we"},
+    {n:"Heimlichkeit",      a:"ge"}, {n:"Mit Tieren umgehen", a:"we"},
+    {n:"Motiv erkennen",    a:"we"}, {n:"Nachforschungen",  a:"in", p:1},
+    {n:"Naturkunde",        a:"in"}, {n:"Religion",         a:"in", p:1},
+    {n:"Täuschen",          a:"ch"}, {n:"Überlebenskunst",  a:"we"},
     {n:"Überzeugen",        a:"ch"}, {n:"Wahrnehmung",      a:"we", p:1},
   ],
   attacks:[
-    {n:"Langbogen", note:"Fernkampf · 45/180 m · Bogenschießen +2", atk:8, dmg:"1W8+3", dtype:"Stich"},
-    {n:"Kurzschwert (Haupthand)", note:"Nahkampf · Finesse, leicht", atk:6, dmg:"1W6+3", dtype:"Stich"},
-    {n:"Kurzschwert (Beidhändig)", note:"Bonusaktion · Finesse, leicht", atk:6, dmg:"1W6", dtype:"Stich"},
-    {n:"Dolch", note:"Nahkampf/Wurf · 6/18 m", atk:6, dmg:"1W4+3", dtype:"Stich"},
+    {n:"Kampfstab (True Strike)", note:"Zaubertrick · Angriff über Intelligenz", atk:5, dmg:"1W6+3", dtype:"Wucht/Strahlend"},
+    {n:"Fire Bolt", note:"Zaubertrick · Fernkampf 36 m", atk:5, dmg:"1W10", dtype:"Feuer"},
+    {n:"Dolch", note:"Finesse · Nahkampf/Wurf 6/18 m", atk:5, dmg:"1W4+3", dtype:"Stich"},
   ],
-  spell:{dc:13, atk:5, ability:"Weisheit"},
-  slots:[ {lvl:"1. Grad", total:4}, {lvl:"2. Grad", total:2} ],
+  spell:{dc:13, atk:5, ability:"Intelligenz"},
+  slots:[ {lvl:"1. Grad", total:2} ],
   spells:[
-    {n:"Jägermal", tag:"1. Grad", d:"Markiere eine Kreatur. Du verursachst +1W6 Schaden mit Waffenangriffen gegen sie und hast Vorteil beim Aufspüren."},
-    {n:"Wunden heilen", tag:"1. Grad", d:"Eine berührte Kreatur erhält 1W8 + Wirkmodifikator Trefferpunkte zurück."},
-    {n:"Zauberbeere", tag:"1. Grad", d:"Erschaffe 10 nährende Beeren; jede heilt 1 TP und sättigt für einen Tag."},
-    {n:"Tierbotschaft", tag:"2. Grad", d:"Ein kleines Tier überbringt eine Nachricht von bis zu 25 Wörtern an einen genannten Ort."},
-    {n:"Dorngewächs", tag:"2. Grad", d:"Lässt auf 6 m schwierigen, dornigen Boden entstehen, der pro 1,5 m Bewegung 2W4 Stichschaden verursacht."},
+    {n:"True Strike", tag:"Zaubertrick", d:"Waffenangriff über Intelligenz statt Stärke/Geschick; Waffenschaden (ab Stufe 5 zusätzlich Strahlenschaden)."},
+    {n:"Blade Ward", tag:"Zaubertrick", d:"Konzentration: Resistenz gegen Wucht-, Stich- und Hiebschaden von Angriffen."},
+    {n:"Fire Bolt", tag:"Zaubertrick", d:"Fernkampf-Zauberangriff auf 36 m; 1W10 Feuerschaden (skaliert mit der Stufe)."},
+    {n:"Prestidigitation", tag:"Zaubertrick · Hochelf", d:"Kleine magische Spielerei; nach langer Rast gegen einen anderen Magier-Cantrip tauschbar."},
+    {n:"Shield", tag:"1. Grad", d:"Reaktion: +5 RK bis zum Beginn deines nächsten Zuges und blockt Magic Missile (keine Konzentration)."},
+    {n:"Mage Armor", tag:"1. Grad", d:"Ohne Rüstung wird deine RK-Basis 13 + Geschickmod. für 8 Std. → RK 16."},
+    {n:"Absorb Elements", tag:"1. Grad", d:"Reaktion: Resistenz gegen einen Elementarschaden; beim nächsten Nahkampftreffer +1W6 desselben Typs."},
+    {n:"Magic Missile", tag:"1. Grad", d:"Drei Geschosse, je 1W4+1 Kraftschaden, treffen automatisch."},
+    {n:"Find Familiar", tag:"Buch · Ritual", d:"Beschwört einen Vertrauten; als Ritual ohne Zauberplatz wirkbar. Hilfe-Aktion gibt Vorteil im Nahkampf."},
+    {n:"Sleep", tag:"Buch · 1. Grad", d:"Im Zauberbuch vorhanden, derzeit nicht vorbereitet."},
   ],
   // cat: "trait" → Ausrüstung-Tab, "combat" → Kampf-Tab. uses:{max,per} ("K"=Kurze Rast, "L"=Lange Rast) zeigt Aufladungs-Pips.
   features:[
-    {t:"Kampfstil: Bogenschießen", cat:"trait", d:"Du erhältst +2 auf Angriffswürfe mit Fernkampfwaffen (bereits in den Werten enthalten)."},
-    {t:"Bevorzugter Feind: Ungeheuer", cat:"trait", d:"Vorteil bei Weisheits-(Überlebenskunst)-Würfen, um Ungeheuer aufzuspüren, und bei Intelligenzwürfen, dich an sie zu erinnern."},
-    {t:"Naturkundiger Entdecker: Wald", cat:"combat", d:"In Wäldern wirst du beim Reisen nicht erschöpft; deine Gruppe bleibt aufmerksam und kann sich nicht verirren."},
-    {t:"Jägerpfad: Kolossschläger", cat:"combat", d:"Einmal pro Runde +1W8 Schaden gegen eine verletzte Kreatur, die du mit einer Waffe triffst."},
-    {t:"Primitives Bewusstsein", cat:"combat", d:"Verbrauche einen Zauberplatz, um zu spüren, ob bestimmte Kreaturentypen in der Umgebung sind."},
-    {t:"Jägermal-Fokus", cat:"combat", uses:{max:2, per:"L"}, d:"Du kannst den Zauber Jägermal bis zu zweimal pro langer Rast wirken, ohne einen Zauberplatz zu verbrauchen."},
-    {t:"Talent: Glückspilz", cat:"trait", uses:{max:3, per:"L"}, d:"Du besitzt 3 Glückspunkte. Verbrauche einen, um einen zusätzlichen W20 für einen Angriffs-, Attributs- oder Rettungswurf zu würfeln und das beste Ergebnis zu wählen — oder um den Angriffswurf eines Gegners zu beeinflussen."},
+    {t:"Zauberwirken (Intelligenz)", cat:"trait", d:"Zauber-SG 13, Zauberangriff +5. Du wirkst aus deinem Zauberbuch."},
+    {t:"Ritual-Adept", cat:"trait", d:"Rituale aus deinem Zauberbuch kannst du wirken, ohne sie vorzubereiten."},
+    {t:"Arkane Erholung", cat:"trait", uses:{max:1, per:"L"}, d:"Einmal pro Tag bei einer kurzen Rast Zauberplätze zurückgewinnen (Gesamtgrad bis zur Hälfte der Magierstufe, aufgerundet)."},
+    {t:"Dunkelsicht 18 m", cat:"trait", d:"Du siehst in Dämmerlicht wie bei hellem Licht und in Dunkelheit wie bei Dämmerlicht (in Grautönen)."},
+    {t:"Feenblut", cat:"trait", d:"Vorteil bei Rettungswürfen gegen den Zustand „bezaubert“."},
+    {t:"Trance", cat:"trait", d:"4 Std. Meditation statt 8 Std. Schlaf für eine lange Rast; nicht magisch einschläferbar."},
+    {t:"Elfen-Linie (Hochelf)", cat:"trait", d:"Du kennst Prestidigitation gratis (nach langer Rast tauschbar). Ab Stufe 3 Detect Magic, ab Stufe 5 Misty Step — je 1×/lange Rast ohne Slot. Zauberattribut: Intelligenz."},
+    {t:"Hintergrund: Mulhorandi Tomb Raider", cat:"trait", d:"Reliktjäger aus dem Land der Gottkönige. Fertigkeiten: Nachforschen, Religion · Werkzeug: Steinmetzwerkzeuge · Herkunfts-Feat: Lucky."},
+    {t:"Feat: Lucky", cat:"trait", uses:{max:2, per:"L"}, d:"Glückspunkte = Übungsbonus (Stufe 1: 2). Vor einem W20-Wurf: 1 Punkt → Vorteil. Greift dich jemand an: 1 Punkt → Nachteil auf den Angriff."},
   ],
   inventory:[
-    {n:"Beschlagene Lederrüstung", q:"getragen"}, {n:"Kurzschwert", q:"×2"},
-    {n:"Langbogen", q:"×1"}, {n:"Pfeile", q:"20"},
-    {n:"Entdeckerpaket", q:"×1"}, {n:"Jagdfalle", q:"×1"},
-    {n:"Wickelumhang & Reisekleidung", q:"×1"}, {n:"Trophäe: Zahn eines Ungeheuers", q:"×1"},
+    {n:"Kampfstab (Arkaner Fokus)", q:"getragen"}, {n:"Dolch", q:"×1"},
+    {n:"Leichter Hammer", q:"×1"}, {n:"Zauberbuch", q:"×1"},
+    {n:"Robe", q:"getragen"}, {n:"Steinmetzwerkzeuge", q:"×1"},
+    {n:"Forscher-Gepäck", q:"×1"}, {n:"Brecheisen · Seil · Stange", q:"×1"},
+    {n:"Fackeln", q:"5"}, {n:"Bettrolle & Rucksack", q:"×1"},
   ],
-  coins:{gm:15, sm:8, km:24},
+  coins:{gm:26, sm:0, km:0},
   persona:[
-    {l:"Persönlichkeitsmerkmal", t:"Ich fühle mich in der Wildnis weit wohler als zwischen Stadtmauern."},
-    {l:"Ideal", t:"Das Gleichgewicht. Die Natur kennt ihre Ordnung — meine Aufgabe ist es, sie zu wahren."},
-    {l:"Bindung", t:"Ich beschütze die Lichtung, in der ich aufgewachsen bin, mit meinem Leben."},
-    {l:"Makel", t:"Ich vertraue Fremden nur langsam und spreche oft zu unverblümt."},
+    {l:"Persönlichkeitsmerkmal", t:"Ich begleite meine Magie mit gesungenen, lateinisch klingenden Formeln — wer die Klinge singt, den hört das Schwert."},
+    {l:"Ideal", t:"Bewahrung. Das Wissen und die Schätze meiner Heimat gehören in würdige Hände, nicht in vergessene Krypten."},
+    {l:"Bindung", t:"Mein Zauberbuch und mein Kampfstab sind mir heiliger als jedes geborgene Gold."},
+    {l:"Makel", t:"Noch bin ich zerbrechlich und zögere im Nahkampf — mein wahres Können erwacht erst mit dem Klingengesang."},
   ],
 };
 
@@ -620,9 +627,11 @@ function tabKampf(){
     t.appendChild(card);
   });
 
-  // combat features
-  t.appendChild(ce("div","sec-title","Kampffähigkeiten"));
-  t.appendChild(buildFeatCards("combat"));
+  // combat features (only if any exist)
+  if(C.features.some(f=>f.cat==="combat")){
+    t.appendChild(ce("div","sec-title","Kampffähigkeiten"));
+    t.appendChild(buildFeatCards("combat"));
+  }
   return t;
 }
 
@@ -793,7 +802,8 @@ function wireHP(){
   $("#hdSpend").onclick=()=>{
     if(state.hitDice<=0)return;
     state.hitDice--;
-    const r=rollDie(10)+abMod("ko");
+    const dieSize=parseInt(C.hitDice.die.replace(/\D/g,""),10)||6;
+    const r=rollDie(dieSize)+abMod("ko");
     state.hp.cur=Math.min(state.hp.max,state.hp.cur+Math.max(1,r));
     renderHP();
     setAdvVisible(false);
@@ -801,7 +811,7 @@ function wireHP(){
     roller.classList.add("show"); d20svg.classList.remove("crit-bg","fumble-bg");
     d20wrap.classList.remove("rolling");void d20wrap.offsetWidth;d20wrap.classList.add("rolling");
     d20num.textContent=Math.max(1,r);
-    rBreak.innerHTML=`1W10 ${fmt(abMod("ko"))} → geheilt`;
+    rBreak.innerHTML=`1${C.hitDice.die} ${fmt(abMod("ko"))} → geheilt`;
     rTotal.innerHTML=`<span class="tt" style="color:var(--emerald)">+${Math.max(1,r)}</span>`;
     rFlag.textContent="";
   };
