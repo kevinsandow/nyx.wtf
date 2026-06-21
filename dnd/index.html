@@ -185,6 +185,12 @@
   .feat:last-child{border-bottom:none}
   .feat .ft{font-family:Cinzel,serif;font-size:13px;font-weight:700;color:var(--gold-bright);letter-spacing:.02em}
   .feat .fd{font-family:Spectral,serif;font-size:13px;color:var(--text-dim);line-height:1.55;margin-top:5px}
+  .feat-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .charge-pips{display:flex;gap:7px;flex-shrink:0}
+  .charge{width:17px;height:17px;border-radius:50%;border:1.5px solid var(--gold-dim);background:var(--surface-2);transition:.2s}
+  .charge.full{background:var(--gold);border-color:var(--gold);box-shadow:0 0 8px rgba(232,179,57,.55)}
+  .charge:active{transform:scale(.85)}
+  .feat-recharge{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold-dim);font-weight:700;margin-top:5px}
   .inv-row{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border-soft);font-size:14px}
   .inv-row:last-child{border-bottom:none}
   .inv-row .q{color:var(--text-faint);font-variant-numeric:tabular-nums;font-weight:600;font-size:13px}
@@ -236,6 +242,22 @@
   .adv-btns .adv{color:var(--emerald);border-color:rgba(95,185,138,.3)}
   .adv-btns .dis{color:var(--crimson-bright);border-color:rgba(216,57,76,.3)}
   .adv-btns .close{color:var(--gold-bright);border-color:var(--border)}
+
+  /* ---- Rest buttons ---- */
+  .rest-btns{display:flex;gap:9px;margin-bottom:4px}
+  .rest-btn{flex:1;padding:13px 0;border-radius:12px;font-weight:700;font-size:13px;letter-spacing:.03em;
+    border:1px solid var(--border-soft);transition:.15s;display:flex;flex-direction:column;align-items:center;gap:3px}
+  .rest-btn:active{transform:scale(.96)}
+  .rest-btn small{font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-faint);font-weight:700}
+  .rest-btn.short{background:rgba(232,179,57,.1);color:var(--gold-bright);border-color:var(--border)}
+  .rest-btn.long{background:rgba(95,185,138,.13);color:var(--emerald);border-color:rgba(95,185,138,.3)}
+
+  /* ---- Toast ---- */
+  #toast{position:fixed;left:50%;bottom:78px;transform:translateX(-50%) translateY(20px);
+    background:var(--surface-solid);border:1px solid var(--border);color:var(--text);
+    padding:11px 18px;border-radius:12px;font-size:12.5px;font-weight:600;z-index:60;text-align:center;max-width:80vw;
+    opacity:0;pointer-events:none;transition:.3s;box-shadow:0 8px 30px rgba(0,0,0,.5)}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
 </head>
 <body>
@@ -301,6 +323,8 @@
   </div>
 </div>
 
+<div id="toast"></div>
+
 <script>
 /* ============== CHARACTER DATA ============== */
 const C = {
@@ -343,12 +367,15 @@ const C = {
     {n:"Tierbotschaft", tag:"2. Grad", d:"Ein kleines Tier überbringt eine Nachricht von bis zu 25 Wörtern an einen genannten Ort."},
     {n:"Dorngewächs", tag:"2. Grad", d:"Lässt auf 6 m schwierigen, dornigen Boden entstehen, der pro 1,5 m Bewegung 2W4 Stichschaden verursacht."},
   ],
+  // cat: "trait" → Ausrüstung-Tab, "combat" → Kampf-Tab. uses:{max,per} ("K"=Kurze Rast, "L"=Lange Rast) zeigt Aufladungs-Pips.
   features:[
-    {t:"Kampfstil: Bogenschießen", d:"Du erhältst +2 auf Angriffswürfe mit Fernkampfwaffen (bereits in den Werten enthalten)."},
-    {t:"Bevorzugter Feind: Ungeheuer", d:"Vorteil bei Weisheits-(Überlebenskunst)-Würfen, um Ungeheuer aufzuspüren, und bei Intelligenzwürfen, dich an sie zu erinnern."},
-    {t:"Naturkundiger Entdecker: Wald", d:"In Wäldern wirst du beim Reisen nicht erschöpft; deine Gruppe bleibt aufmerksam und kann sich nicht verirren."},
-    {t:"Jägerpfad: Kolossschläger", d:"Einmal pro Runde +1W8 Schaden gegen eine verletzte Kreatur, die du mit einer Waffe triffst."},
-    {t:"Primitives Bewusstsein", d:"Verbrauche einen Zauberplatz, um zu spüren, ob bestimmte Kreaturentypen in der Umgebung sind."},
+    {t:"Kampfstil: Bogenschießen", cat:"trait", d:"Du erhältst +2 auf Angriffswürfe mit Fernkampfwaffen (bereits in den Werten enthalten)."},
+    {t:"Bevorzugter Feind: Ungeheuer", cat:"trait", d:"Vorteil bei Weisheits-(Überlebenskunst)-Würfen, um Ungeheuer aufzuspüren, und bei Intelligenzwürfen, dich an sie zu erinnern."},
+    {t:"Naturkundiger Entdecker: Wald", cat:"combat", d:"In Wäldern wirst du beim Reisen nicht erschöpft; deine Gruppe bleibt aufmerksam und kann sich nicht verirren."},
+    {t:"Jägerpfad: Kolossschläger", cat:"combat", d:"Einmal pro Runde +1W8 Schaden gegen eine verletzte Kreatur, die du mit einer Waffe triffst."},
+    {t:"Primitives Bewusstsein", cat:"combat", d:"Verbrauche einen Zauberplatz, um zu spüren, ob bestimmte Kreaturentypen in der Umgebung sind."},
+    {t:"Jägermal-Fokus", cat:"combat", uses:{max:2, per:"L"}, d:"Du kannst den Zauber Jägermal bis zu zweimal pro langer Rast wirken, ohne einen Zauberplatz zu verbrauchen."},
+    {t:"Talent: Glückspilz", cat:"trait", uses:{max:3, per:"L"}, d:"Du besitzt 3 Glückspunkte. Verbrauche einen, um einen zusätzlichen W20 für einen Angriffs-, Attributs- oder Rettungswurf zu würfeln und das beste Ergebnis zu wählen — oder um den Angriffswurf eines Gegners zu beeinflussen."},
   ],
   inventory:[
     {n:"Beschlagene Lederrüstung", q:"getragen"}, {n:"Kurzschwert", q:"×2"},
@@ -378,8 +405,10 @@ let state = {
   hitDice:C.hitDice.cur,
   inspiration:false,
   slots: C.slots.map(s=>s.total),
+  featUses:{}, // keyed by index in C.features, only for features with `uses`
   death:{s:0,f:0},
 };
+C.features.forEach((f,i)=>{ if(f.uses) state.featUses[i]=f.uses.max; });
 
 /* ============== DICE ROLLER ============== */
 const roller=$("#roller"), d20wrap=$("#d20wrap"), d20num=$("#d20num"),
@@ -453,6 +482,39 @@ function setAdvVisible(v){ advWrap.style.display=v?"":"none"; disWrap.style.disp
 /* dice icon */
 const diceIcon=`<svg class="dice-mini" viewBox="0 0 100 100"><polygon points="50,8 86,29 86,71 50,92 14,71 14,29" fill="none" stroke="#e8b339" stroke-width="6"/><text x="50" y="64" text-anchor="middle" font-size="38" font-weight="800" fill="#e8b339" font-family="Inter">20</text></svg>`;
 
+/* ============== FEATURES / FEATS ============== */
+const RECHARGE={K:"Kurze Rast", L:"Lange Rast"};
+function buildFeat(f, idx){
+  const el=ce("div","feat");
+  const head=ce("div","feat-head");
+  head.appendChild(ce("div","ft",f.t));
+  if(f.uses){
+    const pips=ce("div","charge-pips"); pips.dataset.feat=idx;
+    for(let j=0;j<f.uses.max;j++){
+      const p=ce("button","charge"+(j<state.featUses[idx]?" full":"")); p.dataset.idx=j;
+      pips.appendChild(p);
+    }
+    pips.onclick=e=>{
+      const p=e.target.closest(".charge"); if(!p)return;
+      const j=+p.dataset.idx;
+      // same toggle as spell slots: spend from the right, restore up to the tapped pip
+      if(p.classList.contains("full")){ for(let k=f.uses.max-1;k>=j;k--) pips.children[k].classList.remove("full"); }
+      else { for(let k=0;k<=j;k++) pips.children[k].classList.add("full"); }
+      state.featUses[idx]=Array.from(pips.children).filter(x=>x.classList.contains("full")).length;
+    };
+    head.appendChild(pips);
+  }
+  el.appendChild(head);
+  if(f.uses) el.appendChild(ce("div","feat-recharge",`${f.uses.max}× · ${RECHARGE[f.uses.per]}`));
+  el.appendChild(ce("div","fd",f.d));
+  return el;
+}
+function buildFeatCards(cat){
+  const fc=ce("div","card");
+  C.features.forEach((f,i)=>{ if((f.cat||"trait")===cat) fc.appendChild(buildFeat(f,i)); });
+  return fc;
+}
+
 /* ============== TAB BUILDERS ============== */
 function tabUebersicht(){
   const t=ce("div","tab active"); t.id="t-ueber";
@@ -496,6 +558,15 @@ function tabUebersicht(){
   mg.appendChild(ce("div","meta",`<div class="lbl">Passive Wahrnehmung</div><div class="val">${pp}</div>`));
   mg.appendChild(ce("div","meta",`<div class="lbl">Bewegungsrate</div><div class="val">${C.speed}</div>`));
   t.appendChild(mg);
+
+  // rest
+  t.appendChild(ce("div","sec-title","Rast"));
+  const rest=ce("div","rest-btns");
+  const sr=ce("button","rest-btn short",`Kurze Rast<small>Kurzrast-Fähigkeiten</small>`);
+  const lr=ce("button","rest-btn long",`Lange Rast<small>TP · Plätze · Fähigkeiten</small>`);
+  sr.onclick=kurzeRast; lr.onclick=langeRast;
+  rest.appendChild(sr); rest.appendChild(lr);
+  t.appendChild(rest);
   return t;
 }
 
@@ -551,9 +622,7 @@ function tabKampf(){
 
   // combat features
   t.appendChild(ce("div","sec-title","Kampffähigkeiten"));
-  const fc=ce("div","card");
-  C.features.slice(2,5).forEach(f=> fc.appendChild(ce("div","feat",`<div class="ft">${f.t}</div><div class="fd">${f.d}</div>`)));
-  t.appendChild(fc);
+  t.appendChild(buildFeatCards("combat"));
   return t;
 }
 
@@ -638,9 +707,7 @@ function tabAusr(){
   t.appendChild(inv);
 
   t.appendChild(ce("div","sec-title","Merkmale & Fähigkeiten"));
-  const fc=ce("div","card");
-  C.features.slice(0,2).forEach(f=> fc.appendChild(ce("div","feat",`<div class="ft">${f.t}</div><div class="fd">${f.d}</div>`)));
-  t.appendChild(fc);
+  t.appendChild(buildFeatCards("trait"));
 
   t.appendChild(ce("div","sec-title","Charakter"));
   const pc=ce("div","card");
@@ -739,6 +806,41 @@ function wireHP(){
     rFlag.textContent="";
   };
 }
+/* ============== REST / SYNC ============== */
+// Tabs werden einmalig beim Start gebaut; diese Helfer gleichen die bestehenden Pips an den state an.
+function syncSlots(){
+  document.querySelectorAll(".slot").forEach(p=>{
+    p.classList.toggle("full", +p.dataset.idx < state.slots[+p.dataset.lvl]);
+  });
+}
+function syncCharges(){
+  document.querySelectorAll(".charge-pips").forEach(pips=>{
+    const f=+pips.dataset.feat;
+    Array.from(pips.children).forEach((p,j)=> p.classList.toggle("full", j < state.featUses[f]));
+  });
+}
+let toastT=null;
+function toast(msg){
+  const el=$("#toast"); el.textContent=msg; el.classList.add("show");
+  clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove("show"),2600);
+}
+function refreshFeatures(longRest){ // lange Rast frischt auch Kurzrast-Fähigkeiten auf
+  C.features.forEach((f,i)=>{ if(f.uses && (longRest || f.uses.per==="K")) state.featUses[i]=f.uses.max; });
+  syncCharges();
+}
+function kurzeRast(){
+  refreshFeatures(false);
+  toast("Kurze Rast — Fähigkeiten aufgefrischt");
+}
+function langeRast(){
+  refreshFeatures(true);
+  state.slots=C.slots.map(s=>s.total); syncSlots();
+  state.hitDice=Math.min(C.hitDice.total, state.hitDice+Math.max(1,Math.floor(C.hitDice.total/2))); // halbe TW zurück
+  state.hp.cur=state.hp.max; state.hp.temp=0; state.death={s:0,f:0};
+  renderHP(); renderDeath();
+  toast("Lange Rast — TP, Zauberplätze & Fähigkeiten wiederhergestellt");
+}
+
 wireHP(); renderHP(); renderDeath();
 </script>
 </body>
